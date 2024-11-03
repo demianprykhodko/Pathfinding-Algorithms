@@ -1,0 +1,50 @@
+<div class="sidebar-container" [class.closed]="!sidebarOpened">
+    <div id="top-row">
+        <button mat-icon-button (click)="closeSidebar()">
+            <mat-icon>view_sidebar</mat-icon>
+        </button>
+    </div>
+
+    <div id="sidebar-main-container">
+        <div class="sidebar-main-block">
+            <h3 class="sidebar-title">Maze Generation</h3>
+            <div class="sidebar-select-container">
+                <select 
+                    name="grid-maze-generation" 
+                    class="sidebar-select" 
+                    [(ngModel)]="selectedMazeGeneration">
+                    @for (mazeGeneration of mazeGenerations; track $index) {
+                        <option value="{{ mazeGeneration.value }}">{{ mazeGeneration.name }}</option>
+                    }
+                </select>
+            </div>
+            <div class="sidebar-button-container">
+                <button class="sidebar-button" (click)="generateMaze()" [disabled]="isGenerating">
+                    <span>Generate</span>
+                </button>
+            </div>
+        </div>
+
+        <hr>
+        
+        <div class="sidebar-main-block">
+            <h3 class="sidebar-title">Select Algorithm</h3>
+            <div class="sidebar-select-container">
+                <select 
+                    name="grid-maze-generation" 
+                    class="sidebar-select"
+                    [(ngModel)]="selectedAlgorithm">
+                    @for (algorithm of algorithms; track $index) {
+                        <option value="{{ algorithm.value }}">{{ algorithm.name }}</option>
+                    }
+                </select>
+            </div>
+
+            <div class="sidebar-button-container">
+                <button class="sidebar-button" (click)="generatePath()" [disabled]="isGenerating">
+                    <span>Find Path</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

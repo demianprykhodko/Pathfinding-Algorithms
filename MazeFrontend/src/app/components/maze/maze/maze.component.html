@@ -1,0 +1,14 @@
+<div class="maze-grid">
+    <div *ngFor="let row of grid">
+        <div *ngFor="let cell of row"
+            [ngClass]="{
+                'wall': cell.isWall,
+                'start': cell.isStart,
+                'end': cell.isEnd,
+                'path': cell.isPath && !cell.isStart && !cell.isEnd,
+                'visited': cell.isVisited && !cell.isStart && !cell.isEnd && !cell.isPath,
+            }"
+            (click)="onCellClick(cell, $event)">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+:host {
+    height: 100%;
+}
+
+.maze-grid {
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+  
+.maze-grid > div {
+    display: flex;
+}
+
+.maze-grid > div > div {
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border: 1px solid black;
+}
+
+.wall {
+    background-color: #342e44 !important;
+}
+
+.start {
+    background-color: green !important;
+}
+
+.end {
+    background-color: red !important;
+}
+
+.path {
+    background-color: yellow !important;
+}
+
+.visited {
+    background-color: blue !important;
+}
+
+.button-container {
+    width: 100%;
+    display: flex;
+    margin-top: 20px;
+    justify-content: center;
+}

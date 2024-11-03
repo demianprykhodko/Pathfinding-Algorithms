@@ -1,0 +1,16 @@
+<mat-toolbar color="primary">
+    @if (!sidebarOpened) {
+        <button mat-icon-button (click)="openSidebar()">
+            <mat-icon>view_sidebar</mat-icon>
+        </button>
+    }
+    <span class="title">Lexis + Pathfinder</span>
+
+    <span class="spacer"></span>
+
+    <div class="user-circles">
+        <!-- <ng-container *ngFor="let user of users">
+            <div class="user-circle"></div>
+        </ng-container> -->
+    </div>
+</mat-toolbar>

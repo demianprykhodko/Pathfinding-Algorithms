@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MazeCell } from '../../../models/maze-cell.model';
 import { Subject } from 'rxjs';
+import { SignalrService } from '../../signalr/signalr.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,8 @@ export class RecursiveDivisionService {
   // Observable to emit grid updates
   private gridUpdateSubject = new Subject<MazeCell[][]>();
   public gridUpdates$ = this.gridUpdateSubject.asObservable();
+
+  constructor(private signalrService: SignalrService) {}
 
   async generateMaze(grid: MazeCell[][], startCell: MazeCell | undefined, endCell: MazeCell | undefined, skew: number): Promise<void> {
     // Start the division on the full grid
@@ -49,6 +52,7 @@ export class RecursiveDivisionService {
 
      // Emit the updated grid state
      this.gridUpdateSubject.next(grid);
+     this.signalrService.sendMazeUpdate(grid);
      await this.delay(60); // Adjust delay for visualization speed
 
     // Divide recursively in four sections

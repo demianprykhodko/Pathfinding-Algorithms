@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import * as signalR from '@microsoft/signalr';
+import { MazeCell } from '../../models/maze-cell.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignalrService {
   private hubConnection!: signalR.HubConnection;
-  private mazeUpdateSubject = new Subject<any>();
+  public mazeUpdateSubject = new Subject<MazeCell[][]>();
 
   constructor() { 
     this.startConnection();
@@ -26,17 +27,14 @@ export class SignalrService {
   }
 
   private addListeners() {
-    this.hubConnection.on('ReceiveMaze', (mazeUpdate) => {
-      this.mazeUpdateSubject.next(mazeUpdate);
+    this.hubConnection.on('mazeUpdate', (mazeData: MazeCell[][]) => {
+      this.mazeUpdateSubject.next(mazeData); // Emit the update to listeners
     });
   }
 
-  public sendMazeUpdate(mazeUpdate: string) {
-    this.hubConnection.invoke('SendMaze', mazeUpdate)
-      .catch(err => console.error(err));
-  }
-
-  public getMazeUpdates(): Observable<string> {
-    return this.mazeUpdateSubject.asObservable();
+  public sendMazeUpdate(grid: MazeCell[][]) {
+    console.log("send update", grid)
+    this.hubConnection.invoke('MazeUpdate', grid)
+      .catch(err => console.error('Error while sending maze update: ' + err));
   }
 }

@@ -4,9 +4,10 @@ namespace MazeBackend.Hubs
 {
     public class MazeHub : Hub
     {
-        public async Task SendMaze(string maze)
+        public async Task MazeUpdate(object mazeData)
         {
-            await Clients.All.SendAsync("ReceiveMaze", maze);
+            await Clients.Others.SendAsync("mazeUpdate", mazeData);
         }
+
     }
 }

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { SignalrService } from '../../../services/signalr/signalr.service';
 import { MazeService } from '../services/maze.service';
 import { MazeCell } from '../../../models/maze-cell.model';
 
@@ -11,25 +10,14 @@ import { MazeCell } from '../../../models/maze-cell.model';
 export class MazeComponent implements OnInit {
   grid : MazeCell[][] = [];
 
-  constructor(
-    private signalrService: SignalrService,
-    private mazeService: MazeService
-  ) { }
+  constructor(private mazeService: MazeService) { }
 
   ngOnInit(): void {
-    this.signalrService.getMazeUpdates().subscribe((mazeUpdate) => {
-      console.log(mazeUpdate);
-    });
-
     this.mazeService.gridSubject.subscribe((grid) => {
       this.grid = grid;
     });
 
     this.mazeService.initializeGrid(25, 34);
-  }
-
-  sendTestMessage() {
-    this.signalrService.sendMazeUpdate('Hello from Angular!');
   }
 
   onCellClick(cell: MazeCell, event: MouseEvent) {

@@ -6,6 +6,7 @@ import { RandomService } from '../../../services/maze-generation/random/random.s
 import { BreadthFirstSearchService } from '../../../services/pathfinding/bfs/bfs.service';
 import { DepthFirstSearchService } from '../../../services/pathfinding/dfs/dfs.service';
 import { AStarService } from '../../../services/pathfinding/astar/astar.service';
+import { SignalrService } from '../../../services/signalr/signalr.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,13 @@ export class MazeService implements OnDestroy {
     private bfsService: BreadthFirstSearchService,
     private dfsService: DepthFirstSearchService,
     private aStarService: AStarService,
-  ) { }
+    private signalrService: SignalrService
+  ) {
+    this.signalrService.mazeUpdateSubject.subscribe((mazeData: MazeCell[][]) => {
+      this.grid = mazeData; // Replace the local grid with the received grid
+      this.gridSubject.next(this.grid); // Emit the updated grid to update the UI
+    });
+  }
 
   public grid: MazeCell[][] = [];
   // Sends updates to the maze component
@@ -195,6 +202,11 @@ export class MazeService implements OnDestroy {
         }
       }
     }
+  }
+
+  public applyMazeUpdate(mazeUpdate: MazeCell[][]) {
+    this.grid = mazeUpdate;
+    this.gridSubject.next(this.grid); // Notify all components of the new grid state
   }
 
   ngOnDestroy(): void {

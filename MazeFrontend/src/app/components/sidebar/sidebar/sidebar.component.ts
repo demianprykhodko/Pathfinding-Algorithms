@@ -53,7 +53,7 @@ export class SidebarComponent {
   generateMaze(): void {
     switch (this.selectedMazeGeneration) {
       case 'Playground':
-        this.mazeService.clearGrid();
+        this.mazeService.clearGrid(true);
         break;
       case 'recursiveDivision':
         this.mazeService.generateMazeRecursiveDivision();

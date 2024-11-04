@@ -11,7 +11,7 @@ import { SignalrService } from '../../../services/signalr/signalr.service';
 @Injectable({
   providedIn: 'root'
 })
-export class MazeService implements OnDestroy {
+export class MazeService {
 
   constructor(
     private recursiveDivisionService: RecursiveDivisionService,
@@ -22,16 +22,25 @@ export class MazeService implements OnDestroy {
     private signalrService: SignalrService
   ) {
     this.signalrService.mazeUpdateSubject.subscribe((mazeData: MazeCell[][]) => {
-      this.grid = mazeData; // Replace the local grid with the received grid
-      this.gridSubject.next(this.grid); // Emit the updated grid to update the UI
+      this.applyMazeUpdate(mazeData);
     });
+
+    this.signalrService.isGeneratingUpdateSubject.subscribe((isGeneratingData: boolean) => {
+      this.isGeneratingSubject.next(isGeneratingData)
+    })
+
+    this.signalrService.startCellSubject.subscribe((startCell: MazeCell) => {
+      this.startCell = startCell;
+    })
+
+    this.signalrService.endCellSubject.subscribe((endCell: MazeCell) => {
+      this.endCell = endCell;
+    })
   }
 
   public grid: MazeCell[][] = [];
   // Sends updates to the maze component
   public gridSubject = new Subject<MazeCell[][]>();
-  // Subscription to the grid updates in the maze services
-  private gridUpdateSubscription!: Subscription;
 
   private isGeneratingSubject = new BehaviorSubject<boolean>(false);
   isGenerating$ = this.isGeneratingSubject.asObservable();
@@ -66,6 +75,12 @@ export class MazeService implements OnDestroy {
   public updateCell(cell: MazeCell) {
     this.grid[cell.y][cell.x] = cell;
     this.gridSubject.next(this.grid);
+    this.signalrService.sendMazeUpdate(this.grid);
+  }
+
+  public getStartCell(): MazeCell | undefined{
+    if(this.startCell) return this.startCell;
+    return undefined;
   }
 
   public setStartCell(cell: MazeCell) {
@@ -75,9 +90,15 @@ export class MazeService implements OnDestroy {
     }
     cell.isStart = true;
     this.startCell = cell;
+    this.signalrService.setStartCell(this.startCell);
     this.updateCell(cell);
 
     this.clearGrid();
+  }
+
+  public getEndCell(): MazeCell | undefined {
+    if(this.endCell) return this.endCell;
+    return undefined;
   }
 
   public setEndCell(cell: MazeCell) {
@@ -87,6 +108,7 @@ export class MazeService implements OnDestroy {
     }
     cell.isEnd = true;
     this.endCell = cell;
+    this.signalrService.setEndCell(this.endCell);
     this.updateCell(cell);
 
     this.clearGrid();
@@ -95,41 +117,37 @@ export class MazeService implements OnDestroy {
   public async generateMazeRecursiveDivision(skew: number = 0.5) {
     this.clearGrid(true);
     this.isGeneratingSubject.next(true);
-
-    // Unsubscribe from any previous subscription to avoid multiple listeners
-    if (this.gridUpdateSubscription) {
-      this.gridUpdateSubscription.unsubscribe();
-    }
+    this.signalrService.sendIsGeneratingUpdate(true);
 
     // Subscribe to grid updates from RecursiveDivisionService
-    this.gridUpdateSubscription = this.recursiveDivisionService.gridUpdates$.subscribe((grid) => {
-      this.gridSubject.next(grid);
+    this.recursiveDivisionService.gridUpdates$.subscribe((grid) => {
+      this.grid = grid;
+      this.gridSubject.next(this.grid);
     });
 
     // Generate default recursive division maze
     await this.recursiveDivisionService.generateMaze(this.grid, this.startCell, this.endCell, skew);
+
     this.isGeneratingSubject.next(false);
+    this.signalrService.sendIsGeneratingUpdate(false);
   }
 
   public async generateRandom() {
     this.clearGrid(true);
     this.isGeneratingSubject.next(true);
-
-    // Unsubscribe from any previous subscription to avoid multiple listeners
-    if (this.gridUpdateSubscription) {
-      this.gridUpdateSubscription.unsubscribe();
-    }
+    this.signalrService.sendIsGeneratingUpdate(true);
 
     // Subscribe to grid updates from RandomMazeService
-    this.gridUpdateSubscription = this.randomService.gridUpdates$.subscribe((grid) => {
-      this.gridSubject.next(grid);
+    this.randomService.gridUpdates$.subscribe((grid) => {
+      this.grid = grid;
+      this.gridSubject.next(this.grid);
     });
 
     // Generate the random maze asynchronously
     await this.randomService.generateMaze(this.grid, this.startCell, this.endCell);
 
-    // Unsubscribe after generation is complete
-    this.gridUpdateSubscription.unsubscribe();
+    this.isGeneratingSubject.next(false);
+    this.signalrService.sendIsGeneratingUpdate(false);
   }
 
   public async startBfs() {
@@ -141,14 +159,18 @@ export class MazeService implements OnDestroy {
     this.clearGrid();
 
     this.isGeneratingSubject.next(true);
+    this.signalrService.sendIsGeneratingUpdate(true);
 
     this.bfsService.pathUpdates$.subscribe(grid => {
-      this.gridSubject.next(grid);
+      this.grid = grid;
+      this.gridSubject.next(this.grid);
+      this.signalrService.sendMazeUpdate(this.grid);
     });
 
     await this.bfsService.findPath(this.grid, this.startCell, this.endCell);
 
     this.isGeneratingSubject.next(false);
+    this.signalrService.sendIsGeneratingUpdate(false);
   }
 
   public async startDfs() {
@@ -160,14 +182,18 @@ export class MazeService implements OnDestroy {
     this.clearGrid();
 
     this.isGeneratingSubject.next(true);
+    this.signalrService.sendIsGeneratingUpdate(true);
 
     this.dfsService.pathUpdates$.subscribe(grid => {
-      this.gridSubject.next(grid);
+      this.grid = grid;
+      this.gridSubject.next(this.grid);
+      this.signalrService.sendMazeUpdate(this.grid);
     });
 
     await this.dfsService.findPath(this.grid, this.startCell, this.endCell);
 
     this.isGeneratingSubject.next(false);
+    this.signalrService.sendIsGeneratingUpdate(false);
   }
 
   public async startAStar() {
@@ -179,14 +205,18 @@ export class MazeService implements OnDestroy {
     this.clearGrid();
 
     this.isGeneratingSubject.next(true);
+    this.signalrService.sendIsGeneratingUpdate(true);
 
     this.aStarService.pathUpdates$.subscribe(grid => {
-      this.gridSubject.next(grid);
+      this.grid = grid;
+      this.gridSubject.next(this.grid);
+      this.signalrService.sendMazeUpdate(this.grid);
     });
 
     await this.aStarService.findPath(this.grid, this.startCell, this.endCell);
 
     this.isGeneratingSubject.next(false);
+    this.signalrService.sendIsGeneratingUpdate(false);
   }
 
   public clearGrid(walls: boolean = false) {
@@ -198,21 +228,16 @@ export class MazeService implements OnDestroy {
           }
           cell.isPath = false;
           cell.isVisited = false;
-          this.updateCell(cell);
+          this.grid[cell.y][cell.x] = cell;
+          this.gridSubject.next(this.grid);
         }
       }
     }
+    this.signalrService.sendMazeUpdate(this.grid)  
   }
 
   public applyMazeUpdate(mazeUpdate: MazeCell[][]) {
     this.grid = mazeUpdate;
     this.gridSubject.next(this.grid); // Notify all components of the new grid state
-  }
-
-  ngOnDestroy(): void {
-    // Clean up the subscription on service destruction
-    if (this.gridUpdateSubscription) {
-      this.gridUpdateSubscription.unsubscribe();
-    }
   }
 }

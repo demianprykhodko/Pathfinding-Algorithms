@@ -24,19 +24,14 @@ export class MazeComponent implements OnInit {
     if (event.shiftKey) {
       // Set Start Cell
       this.mazeService.setStartCell(cell);
-      // Send update to others
-      // this.signalrService.sendMazeUpdate(cell);
     } else if (event.altKey) {
       // Set End Cell
       this.mazeService.setEndCell(cell);
-      // Send update to others
-      // this.signalrService.sendMazeUpdate(cell);
     } else {
       // Toggle Wall
       if (!cell.isStart && !cell.isEnd) {
         const updatedCell: MazeCell = { ...cell, isWall: !cell.isWall, isPath: false };
         this.mazeService.updateCell(updatedCell);
-        // this.signalrService.sendMazeUpdate(updatedCell);
       }
     }
   }

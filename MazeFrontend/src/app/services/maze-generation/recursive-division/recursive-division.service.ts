@@ -19,6 +19,10 @@ export class RecursiveDivisionService {
 
     if (startCell) grid[startCell.y][startCell.x].isWall = false;
     if (endCell) grid[endCell.y][endCell.x].isWall = false;
+
+    // Emit the updated grid state
+    this.gridUpdateSubject.next(grid);
+    this.signalrService.sendMazeUpdate(grid);
   }
 
   private async divide(grid: MazeCell[][], x: number, y: number, width: number, height: number, skew: number): Promise<void> {

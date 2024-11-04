@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MazeCell } from '../../../models/maze-cell.model';
 import { Subject } from 'rxjs';
+import { SignalrService } from '../../signalr/signalr.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ export class RandomService {
   private gridUpdateSubject = new Subject<MazeCell[][]>();
   public gridUpdates$ = this.gridUpdateSubject.asObservable();
 
-  constructor() { }
+  constructor(private signalrRService: SignalrService) { }
 
   async generateMaze(grid: MazeCell[][], startCell: MazeCell | undefined, endCell: MazeCell | undefined): Promise<MazeCell[][]> {
     // Loop over each cell in the grid
@@ -22,6 +23,7 @@ export class RandomService {
 
         // Emit the grid update to visualize the generation step-by-step
         this.gridUpdateSubject.next(grid);
+        this.signalrRService.sendMazeUpdate(grid);
 
         // Delay for animation effect
         await this.delay(10); // Adjust the delay as needed
@@ -34,6 +36,7 @@ export class RandomService {
 
     // Final grid update after the maze is fully generated
     this.gridUpdateSubject.next(grid);
+    this.signalrRService.sendMazeUpdate(grid);
 
     return grid;
   }

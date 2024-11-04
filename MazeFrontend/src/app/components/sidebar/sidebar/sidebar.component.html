@@ -19,7 +19,7 @@
                 </select>
             </div>
             <div class="sidebar-button-container">
-                <button class="sidebar-button" (click)="generateMaze()" [disabled]="isGenerating">
+                <button class="sidebar-button" (click)="generateMaze()" [disabled]="isGenerating" [ngClass]="{'isGeneratingBorder': isGenerating}">
                     <span>Generate</span>
                 </button>
             </div>
@@ -41,7 +41,7 @@
             </div>
 
             <div class="sidebar-button-container">
-                <button class="sidebar-button" (click)="generatePath()" [disabled]="isGenerating">
+                <button class="sidebar-button" (click)="generatePath()" [disabled]="isGenerating" [ngClass]="{'isGeneratingBorder': isGenerating}">
                     <span>Find Path</span>
                 </button>
             </div>

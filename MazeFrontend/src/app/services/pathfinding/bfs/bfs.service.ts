@@ -37,7 +37,7 @@ export class BreadthFirstSearchService {
           queue.push(neighbor);
 
           this.pathUpdateSubject.next(grid); // Emit update for visualization
-          await this.delay(30); // Adjust delay for animation effect
+          await this.delay(10); // Adjust delay for animation effect
         }
       }
     }

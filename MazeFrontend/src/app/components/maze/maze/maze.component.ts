@@ -1,38 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MazeService } from '../services/maze.service';
 import { MazeCell } from '../../../models/maze-cell.model';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-maze',
   templateUrl: './maze.component.html',
   styleUrl: './maze.component.less'
 })
-export class MazeComponent implements OnInit {
-  grid : MazeCell[][] = [];
+export class MazeComponent implements OnInit, OnDestroy {
+  private readonly destroy$ = new Subject<void>();
+  public grid : MazeCell[][] = [];
 
   constructor(private mazeService: MazeService) { }
 
   ngOnInit(): void {
-    this.mazeService.gridSubject.subscribe((grid) => {
-      this.grid = grid;
-    });
-
-    this.mazeService.initializeGrid(25, 34);
+    this.mazeService.gridSubject
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((grid: MazeCell[][])  => this.grid = grid);
   }
 
-  onCellClick(cell: MazeCell, event: MouseEvent) {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  onCellClick(cell: MazeCell, event: MouseEvent): void {
     if (event.shiftKey) {
-      // Set Start Cell
-      this.mazeService.setStartCell(cell);
+      this.mazeService.configureCell(cell, "start");
+      return;
     } else if (event.altKey) {
-      // Set End Cell
-      this.mazeService.setEndCell(cell);
+      this.mazeService.configureCell(cell, "end");
+      return;
     } else {
-      // Toggle Wall
-      if (!cell.isStart && !cell.isEnd) {
-        const updatedCell: MazeCell = { ...cell, isWall: !cell.isWall, isPath: false };
-        this.mazeService.updateCell(updatedCell);
-      }
+      this.mazeService.configureCell(cell, "wall");
     }
   }
 }

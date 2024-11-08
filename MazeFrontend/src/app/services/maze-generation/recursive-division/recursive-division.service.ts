@@ -20,9 +20,14 @@ export class RecursiveDivisionService {
     if (startCell) grid[startCell.y][startCell.x].isWall = false;
     if (endCell) grid[endCell.y][endCell.x].isWall = false;
 
-    // Emit the updated grid state
-    this.gridUpdateSubject.next(grid);
-    this.signalrService.sendMazeUpdate(grid);
+    // Send start and end cells as a final update if modified
+    const finalUpdates = [];
+    if (startCell) finalUpdates.push(grid[startCell.y][startCell.x]);
+    if (endCell) finalUpdates.push(grid[endCell.y][endCell.x]);
+    if (finalUpdates.length > 0) {
+      this.gridUpdateSubject.next(grid);
+      this.signalrService.sendMazeUpdatev2(finalUpdates);
+    }
   }
 
   private async divide(grid: MazeCell[][], x: number, y: number, width: number, height: number, skew: number): Promise<void> {
@@ -43,6 +48,8 @@ export class RecursiveDivisionService {
     // Draw wall
     const length = horizontal ? width : height;
 
+    const updatedCells: MazeCell[] = []
+
     for (let i = 0; i < length; i++) {
       const cellX = wx + (horizontal ? i : 0);
       const cellY = wy + (horizontal ? 0 : i);
@@ -52,11 +59,12 @@ export class RecursiveDivisionService {
 
       // Set as wall
       grid[cellY][cellX].isWall = true;
+      updatedCells.push(grid[cellY][cellX]);
     }
 
      // Emit the updated grid state
      this.gridUpdateSubject.next(grid);
-     this.signalrService.sendMazeUpdate(grid);
+     this.signalrService.sendMazeUpdatev2(updatedCells);
      await this.delay(60); // Adjust delay for visualization speed
 
     // Divide recursively in four sections

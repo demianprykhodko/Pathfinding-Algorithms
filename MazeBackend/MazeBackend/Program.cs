@@ -1,4 +1,8 @@
+using MazeBackend.Data;
 using MazeBackend.Hubs;
+using MazeBackend.Models;
+using MazeBackend.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddDbContext<MazeDbContext>(options => options.UseInMemoryDatabase("MazeDb"));
+builder.Services.AddScoped<MazeService>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR(options =>
 {
@@ -24,6 +30,41 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<MazeDbContext>();
+    context.Database.EnsureCreated();
+
+    if (!context.MazeCells.Any())
+    {
+        int rows = 25;
+        int cols = 34;
+        int idCounter = 1;
+        var initialCells = new List<MazeCell>();
+
+        for (int y = 0; y < rows; y++)
+        {
+            for (int x = 0; x < cols; x++)
+            {
+                initialCells.Add(new MazeCell
+                {
+                    Id = idCounter++,
+                    X = x,
+                    Y = y,
+                    IsWall = false,
+                    IsStart = false,
+                    IsEnd = false,
+                    IsPath = false,
+                    IsVisited = false
+                });
+            }
+        }
+
+        context.MazeCells.AddRange(initialCells);
+        context.SaveChanges();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
-import { SidebarService } from '../services/sidebar.service';
-import { MazeService } from '../../maze/services/maze.service';
-import { Subscription } from 'rxjs';
+import { Component } from "@angular/core";
+import { SidebarService } from "../services/sidebar.service";
+import { MazeService } from "../../maze/services/maze.service";
+import { Subscription } from "rxjs";
 
 @Component({
-  selector: 'app-sidebar',
-  templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.less'
+  selector: "app-sidebar",
+  templateUrl: "./sidebar.component.html",
+  styleUrl: "./sidebar.component.less"
 })
 export class SidebarComponent {
   public sidebarOpened = true;
@@ -16,21 +16,21 @@ export class SidebarComponent {
 
   // Algorithm selection
   algorithms = [
-    { name: 'Breadth-First Search', value: 'bfs' },
-    { name: 'Depth-First Search', value: 'dfs' },
-    { name: 'A*', value: 'astar' }
+    { name: "Breadth-First Search", value: "bfs" },
+    { name: "Depth-First Search", value: "dfs" },
+    { name: "A*", value: "aStar" }
   ];
-  selectedAlgorithm: string = 'bfs';
+  selectedAlgorithm: "bfs" | "dfs" | "aStar" = "bfs";
 
   // Maze generation methods
   mazeGenerations = [
-    { name: 'Playground', value: 'Playground' },
-    { name: 'Random', value: 'random' },
-    { name: 'Recursive Division', value: 'recursiveDivision' },
-    { name: 'RD (Horizontal skew)', value: 'recursiveDivisionHorizontalSkew' },
-    { name: 'RD (Vertical skew)', value: 'recursiveDivisionVerticalSkew' }
+    { name: "Playground", value: "playground" },
+    { name: "Random", value: "random" },
+    { name: "Recursive Division", value: "recursiveDivision" },
+    { name: "RD (Horizontal skew)", value: "recursiveDivisionHorizontalSkew" },
+    { name: "RD (Vertical skew)", value: "recursiveDivisionVerticalSkew" }
   ];
-  selectedMazeGeneration: string = 'Playground';
+  selectedMazeGeneration: "playground" | "random" | "recursiveDivision" | "recursiveDivisionHorizontalSkew" | "recursiveDivisionVerticalSkew" = "playground";
 
   constructor(
     private sidebarService: SidebarService,
@@ -52,35 +52,25 @@ export class SidebarComponent {
 
   generateMaze(): void {
     switch (this.selectedMazeGeneration) {
-      case 'Playground':
-        this.mazeService.clearGrid(true);
+      case "playground":
+        this.mazeService.resetGrid(true);
         break;
-      case 'recursiveDivision':
-        this.mazeService.generateMazeRecursiveDivision();
+      case "recursiveDivision":
+        this.mazeService.prepareMazeGeneration(this.selectedMazeGeneration);
         break;
-      case 'random':
-        this.mazeService.generateRandom();
+      case "random":
+        this.mazeService.prepareMazeGeneration(this.selectedMazeGeneration);
         break;
-      case 'recursiveDivisionHorizontalSkew':
-        this.mazeService.generateMazeRecursiveDivision(0.7);
+      case "recursiveDivisionHorizontalSkew":
+        this.mazeService.prepareMazeGeneration(this.selectedMazeGeneration, 0.7);
         break;
-      case 'recursiveDivisionVerticalSkew':
-        this.mazeService.generateMazeRecursiveDivision(0.3);
+      case "recursiveDivisionVerticalSkew":
+        this.mazeService.prepareMazeGeneration(this.selectedMazeGeneration, 0.3);
         break;
     }
   }
 
   generatePath(): void {
-    switch (this.selectedAlgorithm) {
-      case 'bfs':
-        this.mazeService.startBfs();
-        break;
-      case 'dfs':
-        this.mazeService.startDfs();
-        break;
-      case 'astar':
-        this.mazeService.startAStar();
-        break;
-    }
+    this.mazeService.preparePathFinding(this.selectedAlgorithm);
   }
 }

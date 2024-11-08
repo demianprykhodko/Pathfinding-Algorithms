@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [SidebarComponent],
-  imports: [CommonModule, MatIconModule, MatFormField, MatLabel, FormsModule],
+  imports: [CommonModule, MatIconModule, FormsModule],
   exports: [SidebarComponent]
 })
 export class SidebarModule { }

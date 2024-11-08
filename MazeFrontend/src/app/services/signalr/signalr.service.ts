@@ -8,10 +8,8 @@ import { MazeCell } from '../../models/maze-cell.model';
 })
 export class SignalrService {
   private hubConnection!: signalR.HubConnection;
-  public mazeUpdateSubject = new Subject<MazeCell[][]>();
+  public mazeUpdateV2Subject = new Subject<MazeCell[]>();
   public isGeneratingUpdateSubject = new Subject<boolean>();
-  public startCellSubject = new Subject<MazeCell>();
-  public endCellSubject = new Subject<MazeCell>();
 
   constructor() { 
     this.startConnection();
@@ -26,44 +24,38 @@ export class SignalrService {
 
     this.hubConnection
       .start()
+      .then(() => {
+        this.requestMazeGrid();
+      })
       .catch(err => console.error("Error while starting connection: " + err));
   }
 
   private addListeners() {
-    this.hubConnection.on("mazeUpdate", (mazeData: MazeCell[][]) => {
-      this.mazeUpdateSubject.next(mazeData); // Emit the update to listeners
+    this.hubConnection.on("mazeUpdatev2", (mazeData: MazeCell[]) => {
+      this.mazeUpdateV2Subject.next(mazeData); // Emit the update to listeners
+    });
+
+    this.hubConnection.on("receiveMazeGrid", (mazeGrid: any) => {
+      this.mazeUpdateV2Subject.next(mazeGrid); // Emit the update to listeners
     });
 
     this.hubConnection.on("isGeneratingUpdate", (isGeneratingData: boolean) => {
       this.isGeneratingUpdateSubject.next(isGeneratingData); // Emit the update to listeners
     });
-
-    this.hubConnection.on("receiveStartCell", (startCellData: MazeCell) => {
-      this.startCellSubject.next(startCellData); // Emit the update to listeners
-    });
-
-    this.hubConnection.on("receiveEndCell", (endCellData: MazeCell) => {
-      this.endCellSubject.next(endCellData); // Emit the update to listeners
-    });
   }
 
-  public sendMazeUpdate(grid: MazeCell[][]) {
-    this.hubConnection.invoke("MazeUpdate", grid)
+  public sendMazeUpdatev2(updatedCells: MazeCell[]) {
+    this.hubConnection.invoke("MazeUpdatev2", updatedCells)
+      .catch(err => console.error("Error while sending maze update: " + err));
+  }
+
+  public requestMazeGrid() {
+    this.hubConnection.invoke("RequestMazeGrid")
       .catch(err => console.error("Error while sending maze update: " + err));
   }
 
   public sendIsGeneratingUpdate(isGenerating: boolean) {
     this.hubConnection.invoke("IsGeneratingUpdate", isGenerating)
       .catch(err => console.error("Error while sending isGenerating update: " + err));  
-  }
-
-  public setStartCell(startCell: MazeCell) {
-    this.hubConnection.invoke("SetStartCell", startCell)
-      .catch(err => console.error("Error while sending start cell: " + err));  
-  }
-
-  public setEndCell(endCell: MazeCell) {
-    this.hubConnection.invoke("SetEndCell", endCell)
-      .catch(err => console.error("Error while sending start cell: " + err));  
   }
 }

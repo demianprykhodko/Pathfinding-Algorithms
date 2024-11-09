@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import * as signalR from '@microsoft/signalr';
 import { MazeCell } from '../../models/maze-cell.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: "root"
@@ -18,7 +19,7 @@ export class SignalrService {
 
   private startConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl("https://localhost:7110/mazehub") // Adjust the URL to match your backend
+      .withUrl(environment.signalrHubUrl) // Adjust the URL to match your backend
       .withAutomaticReconnect()
       .build();
 

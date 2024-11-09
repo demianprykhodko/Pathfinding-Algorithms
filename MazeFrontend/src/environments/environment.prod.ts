@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    signalrHubUrl: 'https://yourproductionurl.com/mazehub'
+    signalrHubUrl: 'https://mazebackend.azurewebsites.net/mazeHub'
 };

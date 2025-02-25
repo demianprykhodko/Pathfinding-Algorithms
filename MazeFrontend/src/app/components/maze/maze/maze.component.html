@@ -1,4 +1,9 @@
-<div class="maze-grid">
+<div *ngIf="isLoading" class="spinner-container">
+    <div class="spinner"></div>
+    <p>Loading grid...</p>
+</div>
+
+<div *ngIf="!isLoading" class="maze-grid">
     <div *ngFor="let row of grid">
         <div *ngFor="let cell of row"
             [ngClass]="{

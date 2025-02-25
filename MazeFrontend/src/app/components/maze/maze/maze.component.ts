@@ -11,13 +11,17 @@ import { Subject, takeUntil } from 'rxjs';
 export class MazeComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   public grid : MazeCell[][] = [];
+  public isLoading: boolean = true;
 
   constructor(private mazeService: MazeService) { }
 
   ngOnInit(): void {
     this.mazeService.gridSubject
       .pipe(takeUntil(this.destroy$))
-      .subscribe((grid: MazeCell[][])  => this.grid = grid);
+      .subscribe((grid: MazeCell[][])  => {
+        this.grid = grid
+        this.isLoading = false;
+      });
   }
 
   ngOnDestroy(): void {

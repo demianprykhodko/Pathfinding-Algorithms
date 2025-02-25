@@ -1,46 +1,49 @@
-mat-toolbar {
-    background-color: #212121;
-    height: 56px;
-    padding: 0 8px;
+#header-container {
+    display: flex;
 
-    button {
-        display: flex;
-        align-items: center;
+    mat-toolbar {
+        background-color: #212121;
+        height: 56px;
         padding: 0 8px;
-        height: 40px;
-        background: none;
-        border: none;
-        color: #b4b4b4;
-        border-radius: 8px;
-
-        &:hover {
-            background-color: #2f2f2f;
+    
+        button {
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            height: 40px;
+            background: none;
+            border: none;
+            color: #b4b4b4;
+            border-radius: 8px;
+    
+            &:hover {
+                background-color: #2f2f2f;
+            }
         }
     }
-}
+    
+    .title {
+        margin-left: 8px;
+        font-size: 20px;
+        color: #b4b4b4;
+        font-weight: 600;
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+    }
+    
+    #controls-button {
+        all: unset;
+        margin-top: 15px;
+        margin-right: 20px;
+        padding: 0 20px;
+        color: white;
+        border: 1px solid white;
+        border-radius: 8px;
+        transition: background-color 0.5s ease, color 0.5s ease;
+    }
 
-.title {
-    margin-left: 8px;
-    font-size: 20px;
-    color: #b4b4b4;
-    font-weight: 600;
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-}
-
-.spacer {
-    flex: 1 1 auto;
-}
-
-.user-circles {
-    display: flex;
-    align-items: center;
-}
-
-.user-circle {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background-color: #fff;
-    margin-left: 8px;
+    #controls-button:hover {
+        background-color: white;
+        color: black;
+    }
 }

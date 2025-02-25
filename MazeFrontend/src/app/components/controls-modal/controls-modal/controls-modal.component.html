@@ -1,0 +1,25 @@
+<div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>Maze Shortcuts</h3>
+        <hr>
+        
+        <div class="info-row">
+            <button class="key-btn">Click</button> ->
+            <span>Place a wall</span>
+        </div>
+
+        <div class="info-row">
+            <button class="key-btn">Ctrl</button> + 
+            <button class="key-btn">Click</button> ->
+            <span>Set start point</span>
+        </div>
+
+        <div class="info-row">
+            <button class="key-btn">Alt</button> + 
+            <button class="key-btn">Click</button> ->
+            <span>Set end point</span>
+        </div>
+
+        <button (click)="closeModal()">Got it</button>
+    </div>
+</div>

@@ -7,8 +7,8 @@ import { SidebarService } from '../../sidebar/services/sidebar.service';
   styleUrl: './header.component.less'
 })
 export class HeaderComponent implements OnInit {
-  // users: any = input('users');
-  public sidebarOpened = true;
+  public sidebarOpened: boolean = true;
+  public showModal: boolean = false;
 
   constructor(private sidebarService: SidebarService) { }
 

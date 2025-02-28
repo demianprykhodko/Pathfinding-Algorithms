@@ -1,42 +1,50 @@
-name: Azure Static Web Apps CI/CD
+name: 🚀 Deploy Angular App to Azure Static Web Apps
 
 on:
   push:
     branches:
       - main
     paths:
-      - MazeFrontend/
+      - MazeFrontend/**
+
   workflow_dispatch:
 
 jobs:
-  build_and_deploy_job:
+  build_and_deploy:
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    name: 🏗️ Build and Deploy Angular to Azure
+
     steps:
-      - uses: actions/checkout@v3
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
 
-      - name: Setup Node.js
+      - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 22
 
-      - name: Install Dependencies
+      - name: 📦 Install Dependencies
         run: |
           cd MazeFrontend
           npm install
 
-      - name: Inject API URL into environment.prod.ts
+      - name: 🔑 Inject API URL into environment.prod.ts
         run: |
           echo "export const environment = {" > MazeFrontend/src/environments/environment.prod.ts
           echo "  production: true," >> MazeFrontend/src/environments/environment.prod.ts
           echo "  signalrHubUrl: '${{ secrets.PROD_API_URL }}'" >> MazeFrontend/src/environments/environment.prod.ts
           echo "};" >> MazeFrontend/src/environments/environment.prod.ts
 
-      - name: Build And Deploy
-        id: builddeploy
+      - name: 🏗️ Build Angular Application
+        run: |
+          cd MazeFrontend
+          npm run build --prod
+
+      - name: 🚀 Deploy to Azure Static Web Apps
+        id: deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WHITE_COAST_0FB725203 }}

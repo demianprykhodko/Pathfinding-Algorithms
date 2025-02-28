@@ -30,13 +30,16 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
 
-      - name: 🔄 Restore Dependencies (with Caching)
-        uses: actions/cache@v3
+      - name: 🔄 Cache NuGet Packages
+        uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
           key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             nuget-${{ runner.os }}-
+
+      - name: 🔄 Restore Dependencies
+        run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
 
       - name: 🏗️ Build Solution
         run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore

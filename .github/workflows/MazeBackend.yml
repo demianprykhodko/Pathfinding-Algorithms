@@ -2,9 +2,10 @@ name: Build and deploy .NET Core application to Web App MazeBackend
 on:
   push:
     branches:
-    - main
+      - main
     paths:
-    - MazeBackend/
+      - MazeBackend/
+  workflow_dispatch:
 env:
   AZURE_WEBAPP_NAME: MazeBackend
   AZURE_WEBAPP_PACKAGE_PATH: MazeBackend\publish

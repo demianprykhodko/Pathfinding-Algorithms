@@ -18,18 +18,18 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v3
         with:
-          submodules: true
-          lfs: false
+          fetch-depth: 1
 
-      - name: ⚙️ Setup Node.js
+      - name: ⚙️ Setup Node.js and Cache Dependencies
         uses: actions/setup-node@v3
         with:
           node-version: 22
+          cache: 'npm'
 
-      - name: 📦 Install Dependencies
+      - name: 📦 Install Dependencies (Use Cache)
         run: |
           cd MazeFrontend
-          npm install
+          npm ci
 
       - name: 🔑 Inject API URL into environment.prod.ts
         run: |
@@ -38,10 +38,12 @@ jobs:
           echo "  signalrHubUrl: '${{ secrets.PROD_API_URL }}'" >> MazeFrontend/src/environments/environment.prod.ts
           echo "};" >> MazeFrontend/src/environments/environment.prod.ts
 
-      - name: 🏗️ Build Angular Application
+      - name: ⚡ Build Angular Application with Caching
         run: |
           cd MazeFrontend
           npm run build --prod
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
 
       - name: 🚀 Deploy to Azure Static Web Apps
         id: deploy
